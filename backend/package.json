@@ -1,7 +1,7 @@
 {
-  "name": "casamento-rafael-alleane",
+  "name": "casamento-alleane-rafael",
   "version": "1.0.0",
-  "description": "Site de presentes do casamento de Rafael e Alleane",
+  "description": "Site do casamento de Alleane e Rafael",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

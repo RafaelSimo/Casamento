@@ -181,7 +181,7 @@ router.post('/pix-manual', async (req, res) => {
       success: true,
       message: 'Presente reservado! Agora faça o PIX e os noivos confirmarão o recebimento. 💕',
       pixKey: process.env.PIX_KEY || 'Chave PIX não configurada',
-      pixName: process.env.PIX_NAME || 'Rafael e Alleane',
+      pixName: process.env.PIX_NAME || 'Alleane e Rafael',
       amount: gift.price
     });
 
@@ -271,7 +271,7 @@ router.get('/status/:externalId', async (req, res) => {
 router.get('/pix-info', (req, res) => {
   res.json({
     pixKey: process.env.PIX_KEY || '',
-    pixName: process.env.PIX_NAME || 'Rafael e Alleane',
+    pixName: process.env.PIX_NAME || 'Alleane e Rafael',
     pixCity: process.env.PIX_CITY || ''
   });
 });

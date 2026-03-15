@@ -130,7 +130,7 @@ async function start() {
     console.log('');
     console.log('  💒 ════════════════════════════════════════════ 💒');
     console.log('  ║                                                ║');
-    console.log('  ║    🎊  Casamento Rafael & Alleane  🎊          ║');
+    console.log('  ║    🎊  Casamento Alleane & Rafael  🎊          ║');
     console.log('  ║    Servidor rodando com sucesso!                ║');
     console.log('  ║                                                ║');
     console.log(`  ║    🌐 https://casamentorafaealle.up.railway.app ║`);

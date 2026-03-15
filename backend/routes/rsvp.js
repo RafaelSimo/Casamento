@@ -71,7 +71,7 @@ async function sendEmailNotification(data) {
   });
 
   await transporter.sendMail({
-    from: `"Casamento Rafael & Alleane" <${emailUser}>`,
+    from: `"Casamento Alleane & Rafael" <${emailUser}>`,
     to: emailTo,
     subject: `💒 Nova confirmação: ${escapeHtml(data.name)} (${data.guests} pessoa${data.guests > 1 ? 's' : ''})`,
     html: `

@@ -1,5 +1,5 @@
 /**
- * Seed dos presentes engraçados do casamento de Rafael & Alleane
+ * Seed dos presentes engraçados do casamento de Alleane & Rafael
  * Execute com: npm run seed
  */
 

@@ -1,6 +1,6 @@
 /**
  * =============================================
- * CASAMENTO RAFAEL & ALLEANE — Admin Panel
+ * CASAMENTO ALLEANE & RAFAEL — Admin Panel
  * =============================================
  */
 

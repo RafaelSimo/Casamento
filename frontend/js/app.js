@@ -1,6 +1,6 @@
 /**
  * =============================================
- * CASAMENTO RAFAEL & ALLEANE — Frontend App
+ * CASAMENTO ALLEANE & RAFAEL — Frontend App
  * =============================================
  */
 
@@ -474,7 +474,7 @@
       }
 
       document.getElementById('success-message').textContent =
-        'Obrigado! Os noivos vão confirmar o recebimento do PIX. Rafael e Alleane agradecem de coração! 💕';
+        'Obrigado! Os noivos vão confirmar o recebimento do PIX. Alleane e Rafael agradecem de coração! 💕';
       showStep('modal-step-success');
       launchConfetti();
     } catch (err) {
