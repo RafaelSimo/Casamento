@@ -290,8 +290,9 @@ body {
 .hero-names-overlay {
   position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -299,6 +300,7 @@ body {
   padding: 36px 50px;
   max-width: 580px;
   width: 90%;
+  margin: 0 auto;
   background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
