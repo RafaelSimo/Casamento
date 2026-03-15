@@ -27,7 +27,7 @@
   // ===== COUNTDOWN =====
   function initCountdown() {
     // 🔧 ALTERE A DATA DO CASAMENTO AQUI:
-    const WEDDING_DATE = new Date('2026-09-20T16:00:00');
+    const WEDDING_DATE = new Date('2026-11-21T16:00:00');
 
     function update() {
       const now = new Date();
