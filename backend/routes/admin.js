@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database');
+const { pool } = require('../database');
 const bcrypt = require('bcrypt');
 const { authenticateToken, generateToken } = require('../middleware/auth');
 
@@ -11,7 +11,7 @@ function sanitize(str, maxLen = 200) {
 }
 
 // POST /api/admin/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = sanitize(username, 50);
@@ -21,11 +21,12 @@ router.post('/login', (req, res) => {
       return res.status(400).json({ error: 'Usuário e senha são obrigatórios.' });
     }
 
-    const admin = db.prepare('SELECT * FROM admin_users WHERE username = ?').get(user);
-    if (!admin || !bcrypt.compareSync(pass, admin.password_hash)) {
+    const { rows } = await pool.query('SELECT * FROM admin_users WHERE username = $1', [user]);
+    if (rows.length === 0 || !(await bcrypt.compare(pass, rows[0].password_hash))) {
       return res.status(401).json({ error: 'Credenciais inválidas.' });
     }
 
+    const admin = rows[0];
     const token = generateToken(admin);
     res.json({ token, username: admin.username });
   } catch (err) {
@@ -35,28 +36,28 @@ router.post('/login', (req, res) => {
 });
 
 // GET /api/admin/dashboard - Estatísticas
-router.get('/dashboard', authenticateToken, (req, res) => {
+router.get('/dashboard', authenticateToken, async (req, res) => {
   try {
-    const totalGifts = db.prepare('SELECT COUNT(*) as count FROM gifts WHERE active = 1').get();
-    const claimedGifts = db.prepare('SELECT COUNT(*) as count FROM gifts WHERE active = 1 AND claimed = 1').get();
-    const pendingGifts = db.prepare("SELECT COUNT(*) as count FROM gifts WHERE active = 1 AND payment_status = 'pending_confirmation'").get();
-    const totalRaised = db.prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status IN ('approved', 'confirmed')").get();
-    const totalMessages = db.prepare('SELECT COUNT(*) as count FROM messages').get();
-    const recentPayments = db.prepare(`
+    const totalGifts = await pool.query('SELECT COUNT(*) as count FROM gifts WHERE active = 1');
+    const claimedGifts = await pool.query('SELECT COUNT(*) as count FROM gifts WHERE active = 1 AND claimed = 1');
+    const pendingGifts = await pool.query("SELECT COUNT(*) as count FROM gifts WHERE active = 1 AND payment_status = 'pending_confirmation'");
+    const totalRaised = await pool.query("SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status IN ('approved', 'confirmed')");
+    const totalMessages = await pool.query('SELECT COUNT(*) as count FROM messages');
+    const recentPayments = await pool.query(`
       SELECT p.*, g.emoji, g.title as gift_title
       FROM payments p
       LEFT JOIN gifts g ON g.id = p.gift_id
       ORDER BY p.created_at DESC
       LIMIT 10
-    `).all();
+    `);
 
     res.json({
-      totalGifts: totalGifts.count,
-      claimedGifts: claimedGifts.count,
-      pendingGifts: pendingGifts.count,
-      totalRaised: totalRaised.total,
-      totalMessages: totalMessages.count,
-      recentPayments
+      totalGifts: parseInt(totalGifts.rows[0].count),
+      claimedGifts: parseInt(claimedGifts.rows[0].count),
+      pendingGifts: parseInt(pendingGifts.rows[0].count),
+      totalRaised: parseFloat(totalRaised.rows[0].total),
+      totalMessages: parseInt(totalMessages.rows[0].count),
+      recentPayments: recentPayments.rows
     });
   } catch (err) {
     console.error('Erro no dashboard:', err);
@@ -65,17 +66,17 @@ router.get('/dashboard', authenticateToken, (req, res) => {
 });
 
 // GET /api/admin/gifts - Lista todos os presentes (admin)
-router.get('/gifts', authenticateToken, (req, res) => {
+router.get('/gifts', authenticateToken, async (req, res) => {
   try {
-    const gifts = db.prepare('SELECT * FROM gifts ORDER BY sort_order ASC, id ASC').all();
-    res.json(gifts);
+    const { rows } = await pool.query('SELECT * FROM gifts ORDER BY sort_order ASC, id ASC');
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao listar presentes.' });
   }
 });
 
 // POST /api/admin/gifts - Adicionar presente
-router.post('/gifts', authenticateToken, (req, res) => {
+router.post('/gifts', authenticateToken, async (req, res) => {
   try {
     const { emoji, title, description, price, sort_order } = req.body;
 
@@ -89,12 +90,12 @@ router.post('/gifts', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Dados incompletos ou inválidos.' });
     }
 
-    const result = db.prepare(`
+    const { rows } = await pool.query(`
       INSERT INTO gifts (emoji, title, description, price, sort_order)
-      VALUES (?, ?, ?, ?, ?)
-    `).run(e, t, d, p, s);
+      VALUES ($1, $2, $3, $4, $5) RETURNING id
+    `, [e, t, d, p, s]);
 
-    res.json({ id: result.lastInsertRowid, message: 'Presente adicionado! 🎁' });
+    res.json({ id: rows[0].id, message: 'Presente adicionado! 🎁' });
   } catch (err) {
     console.error('Erro ao adicionar presente:', err);
     res.status(500).json({ error: 'Erro ao adicionar presente.' });
@@ -102,7 +103,7 @@ router.post('/gifts', authenticateToken, (req, res) => {
 });
 
 // PUT /api/admin/gifts/:id - Editar presente
-router.put('/gifts/:id', authenticateToken, (req, res) => {
+router.put('/gifts/:id', authenticateToken, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
@@ -120,10 +121,10 @@ router.put('/gifts/:id', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Dados incompletos ou inválidos.' });
     }
 
-    db.prepare(`
-      UPDATE gifts SET emoji = ?, title = ?, description = ?, price = ?, sort_order = ?, active = ?, updated_at = datetime('now')
-      WHERE id = ?
-    `).run(e, t, d, p, s, a, id);
+    await pool.query(`
+      UPDATE gifts SET emoji = $1, title = $2, description = $3, price = $4, sort_order = $5, active = $6, updated_at = NOW()
+      WHERE id = $7
+    `, [e, t, d, p, s, a, id]);
 
     res.json({ message: 'Presente atualizado! ✅' });
   } catch (err) {
@@ -133,12 +134,12 @@ router.put('/gifts/:id', authenticateToken, (req, res) => {
 });
 
 // DELETE /api/admin/gifts/:id - Remover presente
-router.delete('/gifts/:id', authenticateToken, (req, res) => {
+router.delete('/gifts/:id', authenticateToken, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
 
-    db.prepare('UPDATE gifts SET active = 0, updated_at = datetime(\'now\') WHERE id = ?').run(id);
+    await pool.query('UPDATE gifts SET active = 0, updated_at = NOW() WHERE id = $1', [id]);
     res.json({ message: 'Presente removido! 🗑️' });
   } catch (err) {
     res.status(500).json({ error: 'Erro ao remover presente.' });
@@ -146,47 +147,48 @@ router.delete('/gifts/:id', authenticateToken, (req, res) => {
 });
 
 // GET /api/admin/payments - Lista pagamentos
-router.get('/payments', authenticateToken, (req, res) => {
+router.get('/payments', authenticateToken, async (req, res) => {
   try {
-    const payments = db.prepare(`
+    const { rows } = await pool.query(`
       SELECT p.*, g.emoji, g.title as gift_title
       FROM payments p
       LEFT JOIN gifts g ON g.id = p.gift_id
       ORDER BY p.created_at DESC
-    `).all();
-    res.json(payments);
+    `);
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao listar pagamentos.' });
   }
 });
 
 // POST /api/admin/payments/:id/confirm - Confirmar PIX manual
-router.post('/payments/:id/confirm', authenticateToken, (req, res) => {
+router.post('/payments/:id/confirm', authenticateToken, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
 
-    const payment = db.prepare('SELECT * FROM payments WHERE id = ?').get(id);
-    if (!payment) return res.status(404).json({ error: 'Pagamento não encontrado.' });
+    const { rows } = await pool.query('SELECT * FROM payments WHERE id = $1', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Pagamento não encontrado.' });
+    const payment = rows[0];
 
     // Atualiza pagamento
-    db.prepare(`
-      UPDATE payments SET status = 'confirmed', updated_at = datetime('now')
-      WHERE id = ?
-    `).run(id);
+    await pool.query(`
+      UPDATE payments SET status = 'confirmed', updated_at = NOW()
+      WHERE id = $1
+    `, [id]);
 
     // Marca presente como escolhido
-    db.prepare(`
+    await pool.query(`
       UPDATE gifts SET
         claimed = 1,
-        claimed_by = ?,
-        claimed_message = ?,
-        claimed_at = datetime('now'),
+        claimed_by = $1,
+        claimed_message = $2,
+        claimed_at = NOW(),
         payment_status = 'paid',
-        payment_id = ?,
-        updated_at = datetime('now')
-      WHERE id = ?
-    `).run(payment.payer_name, payment.payer_message, payment.external_id, payment.gift_id);
+        payment_id = $3,
+        updated_at = NOW()
+      WHERE id = $4
+    `, [payment.payer_name, payment.payer_message, payment.external_id, payment.gift_id]);
 
     res.json({ message: 'Pagamento confirmado! 💰' });
   } catch (err) {
@@ -196,16 +198,17 @@ router.post('/payments/:id/confirm', authenticateToken, (req, res) => {
 });
 
 // POST /api/admin/payments/:id/reject - Rejeitar pagamento
-router.post('/payments/:id/reject', authenticateToken, (req, res) => {
+router.post('/payments/:id/reject', authenticateToken, async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
 
-    const payment = db.prepare('SELECT * FROM payments WHERE id = ?').get(id);
-    if (!payment) return res.status(404).json({ error: 'Pagamento não encontrado.' });
+    const { rows } = await pool.query('SELECT * FROM payments WHERE id = $1', [id]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Pagamento não encontrado.' });
+    const payment = rows[0];
 
-    db.prepare(`UPDATE payments SET status = 'rejected', updated_at = datetime('now') WHERE id = ?`).run(id);
-    db.prepare(`UPDATE gifts SET payment_status = 'available', updated_at = datetime('now') WHERE id = ?`).run(payment.gift_id);
+    await pool.query('UPDATE payments SET status = $1, updated_at = NOW() WHERE id = $2', ['rejected', id]);
+    await pool.query('UPDATE gifts SET payment_status = $1, updated_at = NOW() WHERE id = $2', ['available', payment.gift_id]);
 
     res.json({ message: 'Pagamento rejeitado.' });
   } catch (err) {
@@ -214,17 +217,17 @@ router.post('/payments/:id/reject', authenticateToken, (req, res) => {
 });
 
 // GET /api/admin/messages - Lista mensagens
-router.get('/messages', authenticateToken, (req, res) => {
+router.get('/messages', authenticateToken, async (req, res) => {
   try {
-    const messages = db.prepare('SELECT * FROM messages ORDER BY created_at DESC').all();
-    res.json(messages);
+    const { rows } = await pool.query('SELECT * FROM messages ORDER BY created_at DESC');
+    res.json(rows);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao listar mensagens.' });
   }
 });
 
 // PUT /api/admin/change-password - Alterar senha
-router.put('/change-password', authenticateToken, (req, res) => {
+router.put('/change-password', authenticateToken, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
 
@@ -232,13 +235,13 @@ router.put('/change-password', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Senha deve ter no mínimo 6 caracteres.' });
     }
 
-    const admin = db.prepare('SELECT * FROM admin_users WHERE id = ?').get(req.user.id);
-    if (!admin || !bcrypt.compareSync(currentPassword, admin.password_hash)) {
+    const { rows } = await pool.query('SELECT * FROM admin_users WHERE id = $1', [req.user.id]);
+    if (rows.length === 0 || !(await bcrypt.compare(currentPassword, rows[0].password_hash))) {
       return res.status(401).json({ error: 'Senha atual incorreta.' });
     }
 
-    const newHash = bcrypt.hashSync(newPassword, 12);
-    db.prepare('UPDATE admin_users SET password_hash = ? WHERE id = ?').run(newHash, req.user.id);
+    const newHash = await bcrypt.hash(newPassword, 12);
+    await pool.query('UPDATE admin_users SET password_hash = $1 WHERE id = $2', [newHash, req.user.id]);
 
     res.json({ message: 'Senha alterada com sucesso! 🔐' });
   } catch (err) {

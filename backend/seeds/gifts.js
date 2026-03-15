@@ -4,7 +4,7 @@
  */
 
 require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
-const db = require('../database');
+const { pool, initDatabase } = require('../database');
 
 const gifts = [
   {
@@ -124,38 +124,44 @@ const gifts = [
 // Limpa presentes existentes do seed (não remove adicionados manualmente)
 console.log('🌱 Iniciando seed dos presentes...\n');
 
-const existingCount = db.prepare('SELECT COUNT(*) as count FROM gifts').get().count;
+async function runSeed() {
+  await initDatabase();
 
-if (existingCount > 0) {
-  console.log(`⚠️  Já existem ${existingCount} presentes no banco. Limpando para re-seed...`);
-  db.prepare('DELETE FROM gifts').run();
+  const { rows: countRows } = await pool.query('SELECT COUNT(*) as count FROM gifts');
+  const existingCount = parseInt(countRows[0].count);
+
+  if (existingCount > 0) {
+    console.log(`⚠️  Já existem ${existingCount} presentes no banco. Limpando para re-seed...`);
+    await pool.query('DELETE FROM gifts');
+  }
+
+  for (const gift of gifts) {
+    await pool.query(
+      'INSERT INTO gifts (emoji, title, description, price, sort_order) VALUES ($1, $2, $3, $4, $5)',
+      [gift.emoji, gift.title, gift.description, gift.price, gift.sort_order]
+    );
+  }
+
+  console.log(`✅ ${gifts.length} presentes inseridos com sucesso!\n`);
+  console.log('Lista de presentes:');
+  console.log('─'.repeat(60));
+
+  gifts.forEach((g, i) => {
+    console.log(`  ${g.emoji}  ${g.title} — R$ ${g.price.toFixed(2)}`);
+    console.log(`     "${g.description}"`);
+    console.log('');
+  });
+
+  console.log('─'.repeat(60));
+  console.log(`\n💰 Valor total da lista: R$ ${gifts.reduce((sum, g) => sum + g.price, 0).toFixed(2)}`);
+  console.log('\n🎉 Seed concluído! Agora é só casar!\n');
+
+  await pool.end();
 }
 
-const insert = db.prepare(`
-  INSERT INTO gifts (emoji, title, description, price, sort_order)
-  VALUES (@emoji, @title, @description, @price, @sort_order)
-`);
-
-const insertMany = db.transaction((gifts) => {
-  for (const gift of gifts) {
-    insert.run(gift);
-  }
+runSeed().catch(err => {
+  console.error('Erro no seed:', err);
+  process.exit(1);
 });
-
-insertMany(gifts);
-
-console.log(`✅ ${gifts.length} presentes inseridos com sucesso!\n`);
-console.log('Lista de presentes:');
-console.log('─'.repeat(60));
-
-gifts.forEach((g, i) => {
-  console.log(`  ${g.emoji}  ${g.title} — R$ ${g.price.toFixed(2)}`);
-  console.log(`     "${g.description}"`);
-  console.log('');
-});
-
-console.log('─'.repeat(60));
-console.log(`\n💰 Valor total da lista: R$ ${gifts.reduce((sum, g) => sum + g.price, 0).toFixed(2)}`);
-console.log('\n🎉 Seed concluído! Agora é só casar!\n');
 
 process.exit(0);

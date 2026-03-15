@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../database');
+const { pool } = require('../database');
 const { v4: uuidv4 } = require('uuid');
 
 // Inicializa Mercado Pago (lazy - só quando configurado)
@@ -48,21 +48,22 @@ router.post('/create', async (req, res) => {
     const msg = sanitize(message, 500);
 
     // Verifica se presente existe e está disponível
-    const gift = db.prepare('SELECT * FROM gifts WHERE id = ? AND active = 1').get(id);
-    if (!gift) return res.status(404).json({ error: 'Presente não encontrado.' });
+    const { rows: giftRows } = await pool.query('SELECT * FROM gifts WHERE id = $1 AND active = 1', [id]);
+    if (giftRows.length === 0) return res.status(404).json({ error: 'Presente não encontrado.' });
+    const gift = giftRows[0];
 
     if (gift.claimed) {
       return res.status(409).json({ error: 'Este presente já foi escolhido por outro convidado! 😅' });
     }
 
     // Verifica reservas pendentes recentes (últimos 30 min)
-    const pendingPayment = db.prepare(`
+    const { rows: pendingRows } = await pool.query(`
       SELECT id FROM payments
-      WHERE gift_id = ? AND status = 'pending' AND pix_manual = 0
-      AND datetime(created_at) > datetime('now', '-30 minutes')
-    `).get(id);
+      WHERE gift_id = $1 AND status = 'pending' AND pix_manual = 0
+      AND created_at > NOW() - INTERVAL '30 minutes'
+    `, [id]);
 
-    if (pendingPayment) {
+    if (pendingRows.length > 0) {
       return res.status(409).json({
         error: 'Este presente está sendo adquirido por outro convidado. Tente novamente em alguns minutos! ⏳'
       });
@@ -79,10 +80,10 @@ router.post('/create', async (req, res) => {
     const externalId = uuidv4();
     const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
-    db.prepare(`
+    await pool.query(`
       INSERT INTO payments (external_id, gift_id, amount, payer_name, payer_email, payer_message, payment_method, status)
-      VALUES (?, ?, ?, ?, ?, ?, 'mercadopago', 'pending')
-    `).run(externalId, id, gift.price, name, email, msg);
+      VALUES ($1, $2, $3, $4, $5, $6, 'mercadopago', 'pending')
+    `, [externalId, id, gift.price, name, email, msg]);
 
     // Cria preferência no Mercado Pago
     const preference = await mpPreference.create({
@@ -92,7 +93,7 @@ router.post('/create', async (req, res) => {
           title: `Presente de Casamento: ${gift.emoji} ${gift.title}`,
           description: gift.description,
           quantity: 1,
-          unit_price: gift.price,
+          unit_price: parseFloat(gift.price),
           currency_id: 'BRL'
         }],
         payer: {
@@ -115,10 +116,10 @@ router.post('/create', async (req, res) => {
     });
 
     // Atualiza pagamento com ID da preferência
-    db.prepare(`
-      UPDATE payments SET mercadopago_preference_id = ?, updated_at = datetime('now')
-      WHERE external_id = ?
-    `).run(preference.id, externalId);
+    await pool.query(`
+      UPDATE payments SET mercadopago_preference_id = $1, updated_at = NOW()
+      WHERE external_id = $2
+    `, [preference.id, externalId]);
 
     res.json({
       preferenceId: preference.id,
@@ -133,7 +134,7 @@ router.post('/create', async (req, res) => {
 });
 
 // POST /api/payments/pix-manual - Registra pagamento PIX manual
-router.post('/pix-manual', (req, res) => {
+router.post('/pix-manual', async (req, res) => {
   try {
     const { giftId, payerName, message } = req.body;
 
@@ -146,8 +147,9 @@ router.post('/pix-manual', (req, res) => {
     const msg = sanitize(message, 500);
 
     // Verifica presente
-    const gift = db.prepare('SELECT * FROM gifts WHERE id = ? AND active = 1').get(id);
-    if (!gift) return res.status(404).json({ error: 'Presente não encontrado.' });
+    const { rows: giftRows } = await pool.query('SELECT * FROM gifts WHERE id = $1 AND active = 1', [id]);
+    if (giftRows.length === 0) return res.status(404).json({ error: 'Presente não encontrado.' });
+    const gift = giftRows[0];
 
     if (gift.claimed) {
       return res.status(409).json({ error: 'Este presente já foi escolhido! 😅' });
@@ -156,23 +158,23 @@ router.post('/pix-manual', (req, res) => {
     const externalId = uuidv4();
 
     // Cria pagamento com status pending_confirmation
-    db.prepare(`
+    await pool.query(`
       INSERT INTO payments (external_id, gift_id, amount, payer_name, payer_message, payment_method, status, pix_manual)
-      VALUES (?, ?, ?, ?, ?, 'pix', 'pending_confirmation', 1)
-    `).run(externalId, id, gift.price, name, msg);
+      VALUES ($1, $2, $3, $4, $5, 'pix', 'pending_confirmation', 1)
+    `, [externalId, id, gift.price, name, msg]);
 
     // Reserva o presente
-    db.prepare(`
-      UPDATE gifts SET payment_status = 'pending_confirmation', updated_at = datetime('now')
-      WHERE id = ?
-    `).run(id);
+    await pool.query(`
+      UPDATE gifts SET payment_status = 'pending_confirmation', updated_at = NOW()
+      WHERE id = $1
+    `, [id]);
 
     // Salva mensagem
     if (msg) {
-      db.prepare(`
+      await pool.query(`
         INSERT INTO messages (guest_name, message, gift_title, approved)
-        VALUES (?, ?, ?, 1)
-      `).run(name, msg, `${gift.emoji} ${gift.title}`);
+        VALUES ($1, $2, $3, 1)
+      `, [name, msg, `${gift.emoji} ${gift.title}`]);
     }
 
     res.json({
@@ -206,39 +208,41 @@ router.post('/webhook', async (req, res) => {
       if (!mpPaymentData) return;
 
       const externalRef = mpPaymentData.external_reference;
-      const status = mpPaymentData.status; // approved, pending, rejected, etc.
+      const status = mpPaymentData.status;
 
       // Busca pagamento local
-      const payment = db.prepare('SELECT * FROM payments WHERE external_id = ?').get(externalRef);
-      if (!payment) return;
+      const { rows: paymentRows } = await pool.query('SELECT * FROM payments WHERE external_id = $1', [externalRef]);
+      if (paymentRows.length === 0) return;
+      const payment = paymentRows[0];
 
       // Atualiza pagamento
-      db.prepare(`
-        UPDATE payments SET mercadopago_payment_id = ?, status = ?, updated_at = datetime('now')
-        WHERE external_id = ?
-      `).run(data.id.toString(), status, externalRef);
+      await pool.query(`
+        UPDATE payments SET mercadopago_payment_id = $1, status = $2, updated_at = NOW()
+        WHERE external_id = $3
+      `, [data.id.toString(), status, externalRef]);
 
       // Se aprovado, marca o presente como escolhido
       if (status === 'approved') {
-        db.prepare(`
+        await pool.query(`
           UPDATE gifts SET
             claimed = 1,
-            claimed_by = ?,
-            claimed_message = ?,
-            claimed_at = datetime('now'),
+            claimed_by = $1,
+            claimed_message = $2,
+            claimed_at = NOW(),
             payment_status = 'paid',
-            payment_id = ?,
-            updated_at = datetime('now')
-          WHERE id = ?
-        `).run(payment.payer_name, payment.payer_message, externalRef, payment.gift_id);
+            payment_id = $3,
+            updated_at = NOW()
+          WHERE id = $4
+        `, [payment.payer_name, payment.payer_message, externalRef, payment.gift_id]);
 
         // Salva mensagem do convidado
         if (payment.payer_message) {
-          const gift = db.prepare('SELECT emoji, title FROM gifts WHERE id = ?').get(payment.gift_id);
-          db.prepare(`
+          const { rows: giftRows } = await pool.query('SELECT emoji, title FROM gifts WHERE id = $1', [payment.gift_id]);
+          const gift = giftRows[0];
+          await pool.query(`
             INSERT INTO messages (guest_name, message, gift_title, approved)
-            VALUES (?, ?, ?, 1)
-          `).run(payment.payer_name, payment.payer_message, gift ? `${gift.emoji} ${gift.title}` : '');
+            VALUES ($1, $2, $3, 1)
+          `, [payment.payer_name, payment.payer_message, gift ? `${gift.emoji} ${gift.title}` : '']);
         }
       }
     }
@@ -248,16 +252,16 @@ router.post('/webhook', async (req, res) => {
 });
 
 // GET /api/payments/status/:externalId - Verifica status de pagamento
-router.get('/status/:externalId', (req, res) => {
+router.get('/status/:externalId', async (req, res) => {
   try {
     const externalId = sanitize(req.params.externalId, 50);
-    const payment = db.prepare(`
-      SELECT status, payment_method FROM payments WHERE external_id = ?
-    `).get(externalId);
+    const { rows } = await pool.query(`
+      SELECT status, payment_method FROM payments WHERE external_id = $1
+    `, [externalId]);
 
-    if (!payment) return res.status(404).json({ error: 'Pagamento não encontrado.' });
+    if (rows.length === 0) return res.status(404).json({ error: 'Pagamento não encontrado.' });
 
-    res.json(payment);
+    res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao verificar status.' });
   }
