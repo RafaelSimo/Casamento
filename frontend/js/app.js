@@ -413,7 +413,7 @@
 
   // ===== CONFETTI =====
   function launchConfetti() {
-    const colors = ['#C4917B', '#D4AF37', '#E8C4B8', '#F0D98C', '#8B5E3C', '#FF6B8A', '#32BCAD'];
+    const colors = ['#2E7D50', '#D4AF37', '#A8D5BA', '#F0D98C', '#1B4332', '#4CAF50', '#32BCAD'];
     const shapes = ['circle', 'square'];
     const count = window.innerWidth < 480 ? 40 : 80;
 

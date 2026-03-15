@@ -10,22 +10,22 @@
 }
 
 :root {
-  --primary: #C4917B;
-  --primary-light: #E8C4B8;
-  --primary-dark: #A0725E;
-  --secondary: #8B5E3C;
+  --primary: #2E7D50;
+  --primary-light: #A8D5BA;
+  --primary-dark: #1B5E38;
+  --secondary: #1B4332;
   --accent: #D4AF37;
   --accent-light: #F0D98C;
-  --bg: #FFF8F0;
-  --bg-alt: #FDF0E6;
+  --bg: #F8FBF8;
+  --bg-alt: #EFF6F0;
   --bg-card: rgba(255, 255, 255, 0.92);
-  --text: #2C1810;
-  --text-light: #6B4F3F;
-  --text-muted: #9E8A7F;
-  --border: rgba(196, 145, 123, 0.25);
-  --shadow: 0 8px 32px rgba(44, 24, 16, 0.08);
-  --shadow-hover: 0 16px 48px rgba(44, 24, 16, 0.14);
-  --shadow-soft: 0 4px 16px rgba(44, 24, 16, 0.06);
+  --text: #1A2E1A;
+  --text-light: #3D5C3D;
+  --text-muted: #7A9A7A;
+  --border: rgba(46, 125, 80, 0.25);
+  --shadow: 0 8px 32px rgba(26, 46, 26, 0.08);
+  --shadow-hover: 0 16px 48px rgba(26, 46, 26, 0.14);
+  --shadow-soft: 0 4px 16px rgba(26, 46, 26, 0.06);
   --radius: 20px;
   --radius-sm: 12px;
   --radius-xs: 8px;
@@ -109,7 +109,7 @@ body {
   text-align: center;
   position: relative;
   background:
-    linear-gradient(135deg, #FFF8F0 0%, #FDE8D8 30%, #F5D5C8 60%, #E8C4B8 100%);
+    linear-gradient(135deg, #F8FBF8 0%, #E0F0E4 30%, #C8E6CF 60%, #A8D5BA 100%);
   overflow: hidden;
   padding: 40px 20px;
 }
@@ -123,7 +123,7 @@ body {
   height: 200%;
   background:
     radial-gradient(ellipse at 30% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse at 70% 80%, rgba(196, 145, 123, 0.1) 0%, transparent 60%);
+    radial-gradient(ellipse at 70% 80%, rgba(46, 125, 80, 0.1) 0%, transparent 60%);
   animation: heroShimmer 20s ease-in-out infinite;
 }
 
@@ -237,14 +237,14 @@ body {
   font-size: 1.1rem;
   font-weight: 700;
   border-radius: 999px;
-  box-shadow: 0 8px 24px rgba(196, 145, 123, 0.4);
+  box-shadow: 0 8px 24px rgba(46, 125, 80, 0.4);
   transition: var(--transition);
   animation: fadeInUp 1s ease 1s both;
 }
 
 .cta-button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(196, 145, 123, 0.5);
+  box-shadow: 0 12px 32px rgba(46, 125, 80, 0.5);
 }
 
 .cta-icon {
@@ -576,7 +576,7 @@ body {
 }
 
 .gift-button:hover {
-  box-shadow: 0 6px 20px rgba(196, 145, 123, 0.4);
+  box-shadow: 0 6px 20px rgba(46, 125, 80, 0.4);
   transform: translateY(-2px);
 }
 
@@ -719,7 +719,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(44, 24, 16, 0.6);
+  background: rgba(26, 46, 26, 0.6);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -1260,7 +1260,7 @@ body {
     font-size: 0.95rem;
     min-height: 48px;
     /* Remove hover effects on touch — use active instead */
-    -webkit-tap-highlight-color: rgba(196, 145, 123, 0.2);
+    -webkit-tap-highlight-color: rgba(46, 125, 80, 0.2);
   }
 
   .gift-claimed-badge,
@@ -1463,7 +1463,7 @@ body {
 
   .cta-button:hover {
     transform: none;
-    box-shadow: 0 8px 24px rgba(196, 145, 123, 0.4);
+    box-shadow: 0 8px 24px rgba(46, 125, 80, 0.4);
   }
 
   .cta-button:active {

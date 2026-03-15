@@ -132,8 +132,8 @@ async function start() {
     console.log('  ║    🎊  Casamento Rafael & Alleane  🎊          ║');
     console.log('  ║    Servidor rodando com sucesso!                ║');
     console.log('  ║                                                ║');
-    console.log(`  ║    🌐 http://localhost:${PORT}                    ║`);
-    console.log(`  ║    🔧 Admin: http://localhost:${PORT}/admin       ║`);
+    console.log(`  ║    🌐 https://casamentorafaealle.up.railway.app ║`);
+    console.log(`  ║    🔧 Admin:https://casamentorafaealle.up.railway.app/admin║`);
     console.log('  ║                                                ║');
     console.log('  💒 ════════════════════════════════════════════ 💒');
     console.log('');
