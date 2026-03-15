@@ -405,7 +405,7 @@
             <span class="msg-name">${escapeHtml(m.guest_name)}</span>
             <div style="display:flex;align-items:center;gap:10px;">
               <span class="msg-date">${date}</span>
-              <button onclick="deleteMessage(${m.id})" class="msg-delete-btn" title="Remover recado">🗑️</button>
+              <button class="msg-delete-btn" data-msg-id="${m.id}" title="Remover recado">🗑️</button>
             </div>
           </div>
           ${m.gift_title ? `<div class="msg-gift" style="font-size:13px;color:var(--text-light);margin-bottom:6px;">${escapeHtml(m.gift_title)}</div>` : ''}
@@ -413,6 +413,11 @@
         </div>
       `;
     }).join('');
+
+    // Attach delete handlers
+    list.querySelectorAll('.msg-delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => deleteMessage(btn.dataset.msgId));
+    });
   }
 
   // ===== TOAST =====
@@ -446,7 +451,7 @@
       showAdminToast('Erro ao remover recado.');
     }
   }
-  window.deleteMessage = deleteMessage;
+  // window.deleteMessage not needed - using event delegation
 
   // ===== HELPERS =====
   function formatPrice(price) {
