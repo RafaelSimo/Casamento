@@ -68,7 +68,7 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
 // GET /api/admin/gifts - Lista todos os presentes (admin)
 router.get('/gifts', authenticateToken, async (req, res) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM gifts ORDER BY sort_order ASC, id ASC');
+    const { rows } = await pool.query('SELECT * FROM gifts ORDER BY price ASC, id ASC');
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: 'Erro ao listar presentes.' });

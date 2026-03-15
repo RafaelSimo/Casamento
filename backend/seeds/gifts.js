@@ -8,108 +8,108 @@ const { pool, initDatabase } = require('../database');
 
 const gifts = [
   {
-    emoji: '🍕',
-    title: 'Fundo Pizza de Emergência',
-    description: 'Pra quando ninguém quiser cozinhar (vai acontecer MUITO)',
-    price: 80,
-    sort_order: 1
-  },
-  {
     emoji: '📖',
     title: 'Manual de Instruções do Rafael',
     description: 'Para a Alleane não surtar no primeiro mês de convivência',
-    price: 60,
-    sort_order: 2
+    price: 200,
+    sort_order: 1
   },
   {
     emoji: '🧹',
     title: 'Kit "Quem Vai Limpar a Casa"',
     description: 'Inclui dado de 20 faces pra decidir quem faz o quê',
-    price: 75,
+    price: 210,
+    sort_order: 2
+  },
+  {
+    emoji: '🍕',
+    title: 'Fundo Pizza de Emergência',
+    description: 'Pra quando ninguém quiser cozinhar (vai acontecer MUITO)',
+    price: 220,
     sort_order: 3
   },
   {
     emoji: '💐',
     title: 'Fundo "Desculpa, Amor"',
     description: 'Para as flores que o Rafael VAI ter que comprar... muitas vezes',
-    price: 100,
+    price: 250,
     sort_order: 4
   },
   {
     emoji: '💥',
     title: 'Fundo pra Primeira Briga',
     description: 'Vai acontecer... e precisa de chocolate, vinho e Netflix pra resolver',
-    price: 120,
+    price: 270,
     sort_order: 5
   },
   {
     emoji: '🍺',
     title: 'Fundo Cerveja com os Amigos',
     description: 'Permissão da esposa já inclusa (válida por 24h, condições se aplicam)',
-    price: 130,
+    price: 300,
     sort_order: 6
   },
   {
     emoji: '🆘',
     title: 'Kit Sobrevivência do Marido',
     description: 'Manual "Sim, querida" + chocolate de emergência + cartão "Eu errei"',
-    price: 150,
+    price: 320,
     sort_order: 7
   },
   {
     emoji: '🍽️',
     title: '1 Semana de Almoço pro Rafael',
     description: 'Porque cozinhar não é o forte dele (água queimada é especialidade)',
-    price: 200,
+    price: 350,
     sort_order: 8
   },
   {
     emoji: '📺',
     title: '1 Ano de Streaming Premium',
     description: 'Pra maratonar juntos sem brigar pelo controle remoto (spoiler: vão brigar)',
-    price: 250,
+    price: 400,
     sort_order: 9
   },
   {
     emoji: '🛡️',
     title: 'Seguro Anti-Sogra (Bilateral)',
     description: 'Proteção garantida dos dois lados. Não cobre visitas surpresa.',
-    price: 250,
+    price: 420,
     sort_order: 10
   },
   {
     emoji: '👨‍🍳',
     title: 'Aulas de Culinária pro Rafael',
     description: 'Pra ele parar de confundir sal com açúcar e descobrir que fogão não morde',
-    price: 300,
+    price: 450,
     sort_order: 11
   },
   {
     emoji: '👙',
     title: '1 Ano de Calcinha pra Alleane',
     description: 'Presente prático é presente de qualidade! (52 semanas, 52 calcinhas)',
-    price: 350,
+    price: 500,
     sort_order: 12
   },
   {
     emoji: '🐶',
     title: 'Fundo Pro Primeiro Pet',
     description: 'Antes do bebê, vem o dog! Já aceitamos sugestões de nome',
-    price: 350,
+    price: 520,
     sort_order: 13
   },
   {
     emoji: '🌹',
     title: '1 Ano de Flores "Eu Errei"',
     description: '52 buquês de "me perdoa, amor" — um por semana (o Rafael vai precisar)',
-    price: 400,
+    price: 600,
     sort_order: 14
   },
   {
     emoji: '🧘',
     title: 'Terapia de Casal Preventiva',
     description: 'Melhor prevenir do que remediar, né? 10 sessões pra começar bem',
-    price: 500,
+    price: 750,
     sort_order: 15
   },
   {

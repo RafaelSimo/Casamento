@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
       SELECT id, emoji, title, description, price, claimed, payment_status, sort_order
       FROM gifts
       WHERE active = 1
-      ORDER BY sort_order ASC, id ASC
+      ORDER BY price ASC, id ASC
     `);
 
     res.json(rows);
