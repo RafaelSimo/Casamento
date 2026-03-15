@@ -17,6 +17,7 @@ async function initDatabase() {
         title TEXT NOT NULL,
         description TEXT NOT NULL,
         price NUMERIC(10,2) NOT NULL,
+        image_url TEXT,
         claimed INTEGER DEFAULT 0,
         claimed_by TEXT,
         claimed_message TEXT,
@@ -72,6 +73,11 @@ async function initDatabase() {
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
     `);
+
+    // Migração: adicionar coluna image_url se não existir (deploys anteriores)
+    await client.query(`
+      ALTER TABLE gifts ADD COLUMN IF NOT EXISTS image_url TEXT
+    `).catch(() => {});
 
     // Cria admin padrão se não existir
     const adminUser = process.env.ADMIN_USER || 'admin';

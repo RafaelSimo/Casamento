@@ -373,6 +373,60 @@
       color: #fff;
     }
 
+    /* Gift Image Upload */
+    .gift-image-upload {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .gift-image-preview {
+      width: 100px;
+      height: 100px;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #f9f9f9;
+      flex-shrink: 0;
+    }
+    .gift-image-preview span {
+      font-size: 11px;
+      color: #999;
+      text-align: center;
+    }
+    .gift-image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gift-image-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .btn-danger {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+    }
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+    .gift-thumb {
+      width: 40px;
+      height: 40px;
+      border-radius: 4px;
+      object-fit: cover;
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .tabs { flex-wrap: wrap; }
@@ -536,9 +590,23 @@
       <h2 id="gift-modal-title">Novo Presente</h2>
       <form id="gift-form">
         <input type="hidden" id="gift-form-id">
+        <input type="hidden" id="gift-form-image-url">
         <div class="form-group">
-          <label for="gift-form-emoji">Emoji</label>
+          <label for="gift-form-emoji">Emoji (fallback se não tiver imagem)</label>
           <input type="text" id="gift-form-emoji" placeholder="🎁" required maxlength="10">
+        </div>
+        <div class="form-group">
+          <label>Imagem engraçada (opcional)</label>
+          <div class="gift-image-upload">
+            <div class="gift-image-preview" id="gift-image-preview">
+              <span>Nenhuma imagem</span>
+            </div>
+            <div class="gift-image-actions">
+              <label for="gift-form-file" class="btn btn-outline btn-sm">📷 Escolher imagem</label>
+              <input type="file" id="gift-form-file" accept="image/*" style="display:none">
+              <button type="button" class="btn btn-danger btn-sm" id="gift-remove-image" style="display:none">Remover</button>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label for="gift-form-title">Título</label>

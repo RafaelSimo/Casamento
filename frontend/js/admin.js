@@ -155,7 +155,7 @@
 
       return `
         <tr>
-          <td class="emoji-cell">${escapeHtml(g.emoji)}</td>
+          <td class="emoji-cell">${g.image_url ? `<img src="${escapeHtml(g.image_url)}" class="gift-thumb" alt="">` : escapeHtml(g.emoji)}</td>
           <td>
             <strong>${escapeHtml(g.title)}</strong><br>
             <small style="color:var(--text-light)">${escapeHtml(g.description)}</small>
@@ -188,11 +188,34 @@
       document.getElementById('gift-modal-title').textContent = 'Novo Presente';
       document.getElementById('gift-form-id').value = '';
       document.getElementById('gift-form-emoji').value = '';
+      document.getElementById('gift-form-image-url').value = '';
+      document.getElementById('gift-form-file').value = '';
+      resetImagePreview();
       document.getElementById('gift-form-title').value = '';
       document.getElementById('gift-form-desc').value = '';
       document.getElementById('gift-form-price').value = '';
       document.getElementById('gift-form-order').value = '0';
       document.getElementById('gift-modal').classList.add('visible');
+    });
+
+    // Image file input
+    document.getElementById('gift-form-file').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const preview = document.getElementById('gift-image-preview');
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        preview.innerHTML = `<img src="${ev.target.result}" alt="Preview">`;
+        document.getElementById('gift-remove-image').style.display = 'inline-block';
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Remove image button
+    document.getElementById('gift-remove-image').addEventListener('click', () => {
+      document.getElementById('gift-form-file').value = '';
+      document.getElementById('gift-form-image-url').value = '';
+      resetImagePreview();
     });
 
     document.getElementById('gift-modal-cancel').addEventListener('click', () => {
@@ -208,8 +231,22 @@
     document.getElementById('gift-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = document.getElementById('gift-form-id').value;
+      let imageUrl = document.getElementById('gift-form-image-url').value;
+
+      // Upload image if a new file was selected
+      const fileInput = document.getElementById('gift-form-file');
+      if (fileInput.files.length > 0) {
+        try {
+          imageUrl = await uploadGiftImage(fileInput.files[0]);
+        } catch (err) {
+          showAdminToast('Erro ao enviar imagem.');
+          return;
+        }
+      }
+
       const body = {
         emoji: document.getElementById('gift-form-emoji').value.trim(),
+        image_url: imageUrl || null,
         title: document.getElementById('gift-form-title').value.trim(),
         description: document.getElementById('gift-form-desc').value.trim(),
         price: parseFloat(document.getElementById('gift-form-price').value),
@@ -242,11 +279,38 @@
     });
   }
 
+  async function uploadGiftImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+    const token = localStorage.getItem('admin_token');
+    const res = await fetch(`${API}/admin/gifts/upload-image`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    return data.url;
+  }
+
+  function resetImagePreview() {
+    document.getElementById('gift-image-preview').innerHTML = '<span>Nenhuma imagem</span>';
+    document.getElementById('gift-remove-image').style.display = 'none';
+  }
+
   function editGift(gift) {
     if (!gift) return;
     document.getElementById('gift-modal-title').textContent = 'Editar Presente';
     document.getElementById('gift-form-id').value = gift.id;
     document.getElementById('gift-form-emoji').value = gift.emoji;
+    document.getElementById('gift-form-image-url').value = gift.image_url || '';
+    document.getElementById('gift-form-file').value = '';
+    if (gift.image_url) {
+      document.getElementById('gift-image-preview').innerHTML = `<img src="${gift.image_url}" alt="Preview">`;
+      document.getElementById('gift-remove-image').style.display = 'inline-block';
+    } else {
+      resetImagePreview();
+    }
     document.getElementById('gift-form-title').value = gift.title;
     document.getElementById('gift-form-desc').value = gift.description;
     document.getElementById('gift-form-price').value = gift.price;

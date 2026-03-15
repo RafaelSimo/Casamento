@@ -3,6 +3,32 @@ const router = express.Router();
 const { pool } = require('../database');
 const bcrypt = require('bcrypt');
 const { authenticateToken, generateToken } = require('../middleware/auth');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Upload config
+const uploadDir = path.join(__dirname, '..', '..', 'frontend', 'images', 'gifts');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, uploadDir),
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(null, `gift-${Date.now()}${ext}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const ext = path.extname(file.originalname).toLowerCase();
+    if (allowed.includes(ext)) cb(null, true);
+    else cb(new Error('Tipo de arquivo não permitido.'));
+  }
+});
 
 // Valida e sanitiza input
 function sanitize(str, maxLen = 200) {
@@ -78,22 +104,23 @@ router.get('/gifts', authenticateToken, async (req, res) => {
 // POST /api/admin/gifts - Adicionar presente
 router.post('/gifts', authenticateToken, async (req, res) => {
   try {
-    const { emoji, title, description, price, sort_order } = req.body;
+    const { emoji, title, description, price, sort_order, image_url } = req.body;
 
     const e = sanitize(emoji, 10);
     const t = sanitize(title, 100);
     const d = sanitize(description, 300);
     const p = parseFloat(price);
     const s = parseInt(sort_order, 10) || 0;
+    const img = image_url ? sanitize(image_url, 500) : null;
 
     if (!e || !t || !d || isNaN(p) || p <= 0) {
       return res.status(400).json({ error: 'Dados incompletos ou inválidos.' });
     }
 
     const { rows } = await pool.query(`
-      INSERT INTO gifts (emoji, title, description, price, sort_order)
-      VALUES ($1, $2, $3, $4, $5) RETURNING id
-    `, [e, t, d, p, s]);
+      INSERT INTO gifts (emoji, title, description, price, sort_order, image_url)
+      VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
+    `, [e, t, d, p, s, img]);
 
     res.json({ id: rows[0].id, message: 'Presente adicionado! 🎁' });
   } catch (err) {
@@ -108,7 +135,7 @@ router.put('/gifts/:id', authenticateToken, async (req, res) => {
     const id = parseInt(req.params.id, 10);
     if (isNaN(id)) return res.status(400).json({ error: 'ID inválido.' });
 
-    const { emoji, title, description, price, sort_order, active } = req.body;
+    const { emoji, title, description, price, sort_order, active, image_url } = req.body;
 
     const e = sanitize(emoji, 10);
     const t = sanitize(title, 100);
@@ -116,21 +143,36 @@ router.put('/gifts/:id', authenticateToken, async (req, res) => {
     const p = parseFloat(price);
     const s = parseInt(sort_order, 10) || 0;
     const a = active !== undefined ? (active ? 1 : 0) : 1;
+    const img = image_url !== undefined ? (image_url ? sanitize(image_url, 500) : null) : undefined;
 
     if (!e || !t || !d || isNaN(p) || p <= 0) {
       return res.status(400).json({ error: 'Dados incompletos ou inválidos.' });
     }
 
-    await pool.query(`
-      UPDATE gifts SET emoji = $1, title = $2, description = $3, price = $4, sort_order = $5, active = $6, updated_at = NOW()
-      WHERE id = $7
-    `, [e, t, d, p, s, a, id]);
+    if (img !== undefined) {
+      await pool.query(`
+        UPDATE gifts SET emoji = $1, title = $2, description = $3, price = $4, sort_order = $5, active = $6, image_url = $7, updated_at = NOW()
+        WHERE id = $8
+      `, [e, t, d, p, s, a, img, id]);
+    } else {
+      await pool.query(`
+        UPDATE gifts SET emoji = $1, title = $2, description = $3, price = $4, sort_order = $5, active = $6, updated_at = NOW()
+        WHERE id = $7
+      `, [e, t, d, p, s, a, id]);
+    }
 
     res.json({ message: 'Presente atualizado! ✅' });
   } catch (err) {
     console.error('Erro ao editar presente:', err);
     res.status(500).json({ error: 'Erro ao editar presente.' });
   }
+});
+
+// POST /api/admin/gifts/upload-image - Upload imagem do presente
+router.post('/gifts/upload-image', authenticateToken, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Nenhuma imagem enviada.' });
+  const imageUrl = `images/gifts/${req.file.filename}`;
+  res.json({ url: imageUrl });
 });
 
 // DELETE /api/admin/gifts/:id - Remover presente

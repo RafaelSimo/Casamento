@@ -62,7 +62,7 @@ app.use('/api/payments/pix-manual', paymentLimiter);
 app.use('/api/admin/login', loginLimiter);
 
 // Parser
-app.use(express.json({ limit: '10kb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false }));
 
 // Serve arquivos estáticos do frontend

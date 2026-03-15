@@ -213,7 +213,10 @@
       card.style.animationDelay = `${index * 0.05}s`;
 
       card.innerHTML = `
-        <div class="gift-emoji">${escapeHtml(gift.emoji)}</div>
+        ${gift.image_url
+          ? `<div class="gift-image"><img src="${escapeHtml(gift.image_url)}" alt="${escapeHtml(gift.title)}" loading="lazy"></div>`
+          : `<div class="gift-emoji">${escapeHtml(gift.emoji)}</div>`
+        }
         <h3 class="gift-title">${escapeHtml(gift.title)}</h3>
         <p class="gift-description">${escapeHtml(gift.description)}</p>
         <div class="gift-price">R$ ${formatPrice(gift.price)}</div>

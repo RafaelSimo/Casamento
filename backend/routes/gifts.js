@@ -6,7 +6,7 @@ const { pool } = require('../database');
 router.get('/', async (req, res) => {
   try {
     const { rows } = await pool.query(`
-      SELECT id, emoji, title, description, price, claimed, payment_status, sort_order
+      SELECT id, emoji, title, description, price, claimed, payment_status, sort_order, image_url
       FROM gifts
       WHERE active = 1
       ORDER BY price ASC, id ASC
