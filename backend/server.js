@@ -7,7 +7,14 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 // Inicializa banco de dados (cria tabelas e admin)
-require('./database');
+const db = require('./database');
+
+// Auto-seed: insere presentes se a tabela estiver vazia (primeiro deploy)
+const giftCount = db.prepare('SELECT COUNT(*) as count FROM gifts').get().count;
+if (giftCount === 0) {
+  console.log('📦 Tabela de presentes vazia — executando seed automático...');
+  require('./seeds/gifts');
+}
 
 const app = express();
 
