@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rafael & Alleane — Lista de Presentes 💒</title>
-  <meta name="description" content="Lista de presentes do casamento de Rafael e Alleane. Escolha um presente engraçado e nos ajude a começar essa nova vida!">
+  <title>Rafael & Alleane — Nosso Casamento 💒</title>
+  <meta name="description" content="Site do casamento de Rafael e Alleane. Confirme sua presença, veja fotos, conheça nossa história e escolha um presente!">
   <meta name="theme-color" content="#2E7D50">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,43 +15,245 @@
   <!-- Floating Hearts Background -->
   <div class="floating-hearts" id="floating-hearts" aria-hidden="true"></div>
 
+  <!-- ========== NAVBAR ========== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">R & A</a>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#historia">Nossa História</a></li>
+        <li><a href="#galeria">Fotos</a></li>
+        <li><a href="#local">Local</a></li>
+        <li><a href="#presentes">Presentes</a></li>
+        <li><a href="#rsvp" class="nav-cta">Confirmar Presença</a></li>
+      </ul>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
   <!-- ========== HERO ========== -->
   <header class="hero" id="hero">
-    <div class="hero-decoration hero-decoration--top"></div>
-    <div class="hero-content">
-      <p class="hero-pretitle">Você foi convidado para celebrar o casamento de</p>
-      <h1 class="couple-names">
-        <span class="name name--groom">Rafael</span>
-        <span class="ampersand">&</span>
-        <span class="name name--bride">Alleane</span>
-      </h1>
-      <div class="hero-divider">
-        <span>💍</span>
+    <!-- Spotify Player -->
+    <div class="spotify-bar">
+      <div class="spotify-container">
+        <span class="spotify-label">🎵 Nossa Trilha Sonora</span>
+        <!-- TROQUE o link abaixo pela URL da sua playlist do Spotify -->
+        <iframe style="border-radius:12px"
+          src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M?utm_source=generator&theme=0"
+          width="100%" height="80" frameBorder="0"
+          allowfullscreen=""
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"></iframe>
       </div>
-      <p class="hero-tagline">
-        Nos ajude a começar essa nova fase...<br>
-        <strong>sem falir!</strong> 💸
-      </p>
-      <p class="hero-subtitle">
-        Escolha um presente engraçado (mas muito útil!) da nossa lista.<br>
-        Cada centavo será usado com muito amor... e um pouco de humor.
-      </p>
-      <a href="#presentes" class="cta-button" id="cta-button">
-        <span>Ver a Lista de Presentes</span>
-        <span class="cta-icon">🎁</span>
-      </a>
     </div>
-    <div class="hero-scroll-indicator">
-      <div class="scroll-arrow"></div>
+
+    <!-- Hero Photo -->
+    <div class="hero-photo">
+      <img src="images/hero.jpg" alt="Rafael e Alleane" class="hero-img" id="hero-img"
+           onerror="this.style.display='none'; document.getElementById('hero-placeholder').style.display='flex';">
+      <div class="hero-placeholder" id="hero-placeholder" style="display:none;">
+        <span class="hero-placeholder-icon">📸</span>
+        <p>Adicione a foto do casal em<br><strong>frontend/images/hero.jpg</strong></p>
+      </div>
+    </div>
+
+    <!-- Names Overlay Box -->
+    <div class="hero-names-overlay">
+      <div class="hero-leaf">🌿</div>
+      <div class="hero-names-inner">
+        <div class="gold-line"></div>
+        <h1 class="couple-names">
+          <span class="name">Rafael</span>
+          <span class="ampersand">&</span>
+          <span class="name">Alleane</span>
+        </h1>
+        <p class="hero-tagline">Estamos Casando!</p>
+        <div class="gold-line"></div>
+      </div>
+      <div class="hero-leaf hero-leaf--flip">🌿</div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="countdown" id="countdown">
+      <div class="countdown-item">
+        <span class="countdown-number" id="countdown-days">00</span>
+        <span class="countdown-label">dias</span>
+      </div>
+      <span class="countdown-sep">,</span>
+      <div class="countdown-item">
+        <span class="countdown-number" id="countdown-hours">00</span>
+        <span class="countdown-label">horas</span>
+      </div>
+      <span class="countdown-sep">,</span>
+      <div class="countdown-item">
+        <span class="countdown-number" id="countdown-minutes">00</span>
+        <span class="countdown-label">min</span>
+      </div>
     </div>
   </header>
 
-  <!-- ========== INTRO ========== -->
+  <!-- ========== NOSSA HISTÓRIA ========== -->
+  <section class="historia section" id="historia">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-leaf">🌿</div>
+        <h2 class="section-title">Nossa História</h2>
+        <div class="section-divider"><span>💕</span></div>
+      </div>
+      <div class="historia-content">
+        <p>
+          <!-- EDITE AQUI: Conte a história do casal! -->
+          Escreva aqui a história de Rafael e Alleane. Como se conheceram,
+          os primeiros encontros, as aventuras juntos e como decidiram
+          unir suas vidas para sempre.
+        </p>
+        <p>
+          Conte sobre os momentos especiais que marcaram a jornada do casal,
+          as viagens inesquecíveis, os desafios superados e tudo aquilo que
+          torna essa história única e especial.
+        </p>
+        <div class="historia-signature">Rafael & Alleane</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== GALERIA ========== -->
+  <section class="galeria section" id="galeria">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-leaf">🌿</div>
+        <h2 class="section-title">Galeria</h2>
+        <div class="section-divider"><span>📸</span></div>
+      </div>
+      <div class="galeria-grid">
+        <!-- Adicione as fotos na pasta frontend/images/ -->
+        <div class="galeria-item">
+          <img src="images/foto1.jpg" alt="Foto do casal" onerror="this.parentElement.classList.add('no-img')">
+          <span class="galeria-ph">foto1.jpg</span>
+        </div>
+        <div class="galeria-item">
+          <img src="images/foto2.jpg" alt="Foto do casal" onerror="this.parentElement.classList.add('no-img')">
+          <span class="galeria-ph">foto2.jpg</span>
+        </div>
+        <div class="galeria-item">
+          <img src="images/foto3.jpg" alt="Foto do casal" onerror="this.parentElement.classList.add('no-img')">
+          <span class="galeria-ph">foto3.jpg</span>
+        </div>
+        <div class="galeria-item">
+          <img src="images/foto4.jpg" alt="Foto do casal" onerror="this.parentElement.classList.add('no-img')">
+          <span class="galeria-ph">foto4.jpg</span>
+        </div>
+        <div class="galeria-item">
+          <img src="images/foto5.jpg" alt="Foto do casal" onerror="this.parentElement.classList.add('no-img')">
+          <span class="galeria-ph">foto5.jpg</span>
+        </div>
+        <div class="galeria-item">
+          <img src="images/foto6.jpg" alt="Foto do casal" onerror="this.parentElement.classList.add('no-img')">
+          <span class="galeria-ph">foto6.jpg</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== LOCAL / MAPAS ========== -->
+  <section class="local section" id="local">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-leaf">🌿</div>
+        <h2 class="section-title">Local</h2>
+        <div class="section-divider"><span>📍</span></div>
+      </div>
+      <div class="mapas-grid">
+        <div class="mapa-card">
+          <h3>🏛️ Cerimônia</h3>
+          <!-- EDITE: coloque o nome e endereço da igreja -->
+          <p class="mapa-endereco">Nome da Igreja — Endereço, Manaus-AM</p>
+          <div class="mapa-embed">
+            <!-- EDITE: cole o link de incorporação do Google Maps da igreja -->
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63695.05857558468!2d-60.0525!3d-3.1190!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1bc8b13e9e0d%3A0x2b3f5c2e0b0a8f7b!2sManaus%20-%20AM!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr"
+              width="100%" height="280" style="border:0;" allowfullscreen="" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+        <div class="mapa-card">
+          <h3>🎉 Recepção</h3>
+          <!-- EDITE: coloque o nome e endereço do salão de festas -->
+          <p class="mapa-endereco">Nome do Salão — Endereço, Manaus-AM</p>
+          <div class="mapa-embed">
+            <!-- EDITE: cole o link de incorporação do Google Maps do salão -->
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63695.05857558468!2d-60.0525!3d-3.1190!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x926c1bc8b13e9e0d%3A0x2b3f5c2e0b0a8f7b!2sManaus%20-%20AM!5e0!3m2!1spt-BR!2sbr!4v1710000000000!5m2!1spt-BR!2sbr"
+              width="100%" height="280" style="border:0;" allowfullscreen="" loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CONFIRMAR PRESENÇA ========== -->
+  <section class="rsvp section" id="rsvp">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-leaf">🌿</div>
+        <h2 class="section-title">Confirme sua Presença</h2>
+        <div class="section-divider"><span>💌</span></div>
+        <p class="section-subtitle">Ficaremos muito felizes com a sua presença nesse dia especial!</p>
+      </div>
+      <div class="rsvp-card">
+        <form class="rsvp-form" id="rsvp-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rsvp-name">Nome completo *</label>
+              <input type="text" id="rsvp-name" required maxlength="100" placeholder="Seu nome completo">
+            </div>
+            <div class="form-group">
+              <label for="rsvp-email">E-mail</label>
+              <input type="email" id="rsvp-email" maxlength="150" placeholder="seu@email.com">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="rsvp-phone">Telefone / WhatsApp</label>
+              <input type="tel" id="rsvp-phone" maxlength="20" placeholder="(92) 99999-9999">
+            </div>
+            <div class="form-group">
+              <label for="rsvp-guests">Quantas pessoas (incluindo você)?</label>
+              <select id="rsvp-guests">
+                <option value="1">1 pessoa</option>
+                <option value="2">2 pessoas</option>
+                <option value="3">3 pessoas</option>
+                <option value="4">4 pessoas</option>
+                <option value="5">5 pessoas</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rsvp-message">Mensagem para os noivos 💕</label>
+            <textarea id="rsvp-message" rows="3" maxlength="500" placeholder="Deixe um recado carinhoso!"></textarea>
+          </div>
+          <button type="submit" class="rsvp-submit" id="rsvp-submit">
+            <span>Confirmar Presença</span>
+            <span class="rsvp-submit-icon">💒</span>
+          </button>
+        </form>
+        <div class="rsvp-success hidden" id="rsvp-success">
+          <div class="rsvp-success-icon">🎉</div>
+          <h3>Presença Confirmada!</h3>
+          <p>Obrigado! Mal podemos esperar para celebrar com você!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COMO FUNCIONA ========== -->
   <section class="intro section" id="intro">
     <div class="container">
       <div class="intro-card">
         <div class="intro-emoji">💌</div>
-        <h2>Como funciona?</h2>
+        <h2>Como funciona a lista de presentes?</h2>
         <div class="intro-steps">
           <div class="step">
             <div class="step-number">1</div>
@@ -126,9 +328,11 @@
   <footer class="footer">
     <div class="container">
       <div class="footer-content">
+        <div class="footer-leaf">🌿</div>
         <p class="footer-names">Rafael & Alleane</p>
+        <p class="footer-date">2026</p>
         <p class="footer-message">Obrigado por fazer parte desse dia tão especial! 💒</p>
-        <p class="footer-heart">Made with ❤️ e um pouco de loucura</p>
+        <p class="footer-heart">Made with ❤️</p>
       </div>
     </div>
   </footer>

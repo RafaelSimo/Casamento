@@ -61,6 +61,16 @@ async function initDatabase() {
         approved INTEGER DEFAULT 1,
         created_at TIMESTAMPTZ DEFAULT NOW()
       );
+
+      CREATE TABLE IF NOT EXISTS rsvp (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT,
+        phone TEXT,
+        guests INTEGER DEFAULT 1,
+        message TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      );
     `);
 
     // Cria admin padrão se não existir

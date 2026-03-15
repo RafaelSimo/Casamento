@@ -13,13 +13,124 @@
   // ===== INIT =====
   document.addEventListener('DOMContentLoaded', () => {
     createFloatingHearts();
+    initCountdown();
+    initNavbar();
     initScrollReveal();
+    initRSVP();
     loadGifts();
     loadMessages();
     initModal();
     initSmoothScroll();
     checkPaymentReturn();
   });
+
+  // ===== COUNTDOWN =====
+  function initCountdown() {
+    // 🔧 ALTERE A DATA DO CASAMENTO AQUI:
+    const WEDDING_DATE = new Date('2026-09-20T16:00:00');
+
+    function update() {
+      const now = new Date();
+      const diff = WEDDING_DATE - now;
+
+      if (diff <= 0) {
+        document.getElementById('countdown-days').textContent = '🎉';
+        document.getElementById('countdown-hours').textContent = '🎉';
+        document.getElementById('countdown-minutes').textContent = '🎉';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+      document.getElementById('countdown-days').textContent = String(days).padStart(2, '0');
+      document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
+    }
+
+    update();
+    setInterval(update, 60000);
+  }
+
+  // ===== NAVBAR =====
+  function initNavbar() {
+    const navbar = document.getElementById('navbar');
+    const toggle = document.getElementById('nav-toggle');
+    const links = document.getElementById('nav-links');
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        navbar.classList.add('visible');
+      } else {
+        navbar.classList.remove('visible');
+      }
+    });
+
+    toggle.addEventListener('click', () => {
+      links.classList.toggle('active');
+      toggle.classList.toggle('active');
+    });
+
+    links.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        links.classList.remove('active');
+        toggle.classList.remove('active');
+      });
+    });
+  }
+
+  // ===== RSVP =====
+  function initRSVP() {
+    const form = document.getElementById('rsvp-form');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('rsvp-name').value.trim();
+      if (!name) {
+        showToast('Preencha seu nome!', 'warning');
+        return;
+      }
+
+      const submitBtn = document.getElementById('rsvp-submit');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Enviando...</span>';
+
+      try {
+        const res = await fetch(`${API}/rsvp`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email: document.getElementById('rsvp-email').value.trim(),
+            phone: document.getElementById('rsvp-phone').value.trim(),
+            guests: document.getElementById('rsvp-guests').value,
+            message: document.getElementById('rsvp-message').value.trim()
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showToast(data.error || 'Erro ao confirmar presença.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Confirmar Presença</span><span class="rsvp-submit-icon">💒</span>';
+          return;
+        }
+
+        form.classList.add('hidden');
+        document.getElementById('rsvp-success').classList.remove('hidden');
+        showToast('Presença confirmada! 🎉', 'success');
+        launchConfetti();
+      } catch (err) {
+        showToast('Erro de conexão. Tente novamente.', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span>Confirmar Presença</span><span class="rsvp-submit-icon">💒</span>';
+      }
+    });
+  }
 
   // ===== FLOATING HEARTS =====
   function createFloatingHearts() {
@@ -51,7 +162,7 @@
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.intro-card, .section-header, .gifts-stats, .gift-card, .message-bubble')
+    document.querySelectorAll('.intro-card, .section-header, .gifts-stats, .gift-card, .message-bubble, .historia-content, .galeria-item, .mapa-card, .rsvp-card')
       .forEach(el => {
         el.classList.add('reveal');
         observer.observe(el);

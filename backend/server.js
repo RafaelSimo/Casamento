@@ -21,7 +21,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "https://sdk.mercadopago.com"],
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'", "https://api.mercadopago.com"],
-      frameSrc: ["https://www.mercadopago.com.br", "https://www.mercadopago.com"],
+      frameSrc: ["https://www.mercadopago.com.br", "https://www.mercadopago.com", "https://open.spotify.com", "https://www.google.com"],
     }
   }
 }));
@@ -72,6 +72,7 @@ app.use(express.static(path.join(__dirname, '..', 'frontend')));
 app.use('/api/gifts', require('./routes/gifts'));
 app.use('/api/payments', require('./routes/payments'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/rsvp', require('./routes/rsvp'));
 
 // Fallback para SPA
 app.get('/admin', (req, res) => {
