@@ -400,10 +400,13 @@
       });
 
       return `
-        <div class="message-card">
+        <div class="message-card" id="msg-${m.id}">
           <div class="msg-header">
             <span class="msg-name">${escapeHtml(m.guest_name)}</span>
-            <span class="msg-date">${date}</span>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="msg-date">${date}</span>
+              <button onclick="deleteMessage(${m.id})" class="msg-delete-btn" title="Remover recado">🗑️</button>
+            </div>
           </div>
           ${m.gift_title ? `<div class="msg-gift" style="font-size:13px;color:var(--text-light);margin-bottom:6px;">${escapeHtml(m.gift_title)}</div>` : ''}
           <div class="msg-text">"${escapeHtml(m.message)}"</div>
@@ -424,6 +427,26 @@
 
     setTimeout(() => toast.remove(), 3500);
   }
+
+  // ===== DELETE MESSAGE =====
+  async function deleteMessage(id) {
+    if (!confirm('Tem certeza que deseja remover este recado?')) return;
+    try {
+      const res = await authFetch(`${API}/admin/messages/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        const card = document.getElementById(`msg-${id}`);
+        if (card) card.remove();
+        showAdminToast('Recado removido com sucesso!');
+        loadDashboard();
+      } else {
+        showAdminToast('Erro ao remover recado.');
+      }
+    } catch (err) {
+      console.error('Erro ao remover mensagem:', err);
+      showAdminToast('Erro ao remover recado.');
+    }
+  }
+  window.deleteMessage = deleteMessage;
 
   // ===== HELPERS =====
   function formatPrice(price) {

@@ -226,6 +226,20 @@ router.get('/messages', authenticateToken, async (req, res) => {
   }
 });
 
+// DELETE /api/admin/messages/:id - Remover mensagem
+router.delete('/messages/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { rowCount } = await pool.query('DELETE FROM messages WHERE id = $1', [id]);
+    if (rowCount === 0) {
+      return res.status(404).json({ error: 'Mensagem não encontrada.' });
+    }
+    res.json({ message: 'Mensagem removida com sucesso.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Erro ao remover mensagem.' });
+  }
+});
+
 // PUT /api/admin/change-password - Alterar senha
 router.put('/change-password', authenticateToken, async (req, res) => {
   try {
