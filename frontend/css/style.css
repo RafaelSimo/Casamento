@@ -273,8 +273,8 @@ body {
   margin: -70px auto 0;
   max-width: 580px;
   width: 90%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  background: #FFFFFF;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   z-index: 2;
   animation: fadeInUp 1s ease 0.3s both;
 }
@@ -313,6 +313,7 @@ body {
   font-size: clamp(2.5rem, 7vw, 4rem);
   color: var(--secondary);
   line-height: 1.1;
+  text-shadow: none;
 }
 
 .ampersand {
