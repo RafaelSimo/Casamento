@@ -254,8 +254,7 @@ body {
   height: 70vh;
   min-height: 400px;
   max-height: 700px;
-  overflow: visible;
-  margin-bottom: 80px;
+  overflow: hidden;
 }
 
 .hero-img {
@@ -290,9 +289,9 @@ body {
 /* Names Overlay Box */
 .hero-names-overlay {
   position: absolute;
-  bottom: 0;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%) translateY(40%);
+  transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -300,10 +299,10 @@ body {
   padding: 36px 50px;
   max-width: 580px;
   width: 90%;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   z-index: 2;
   animation: fadeInUp 1s ease 0.3s both;
 }
@@ -1531,7 +1530,7 @@ body {
   .nav-toggle { display: flex; }
 
   /* Hero */
-  .hero-photo { height: 50vh; min-height: 300px; margin-bottom: 70px; }
+  .hero-photo { height: 50vh; min-height: 300px; }
   .hero-names-overlay { padding: 28px 24px; gap: 16px; }
 
   /* Galeria */
@@ -1583,7 +1582,7 @@ body {
   .section { padding: 44px 0; }
 
   /* Hero — compact for small screens */
-  .hero-photo { height: 45vh; min-height: 250px; margin-bottom: 60px; }
+  .hero-photo { height: 45vh; min-height: 250px; }
   .hero-names-overlay {
     padding: 20px 16px;
     gap: 10px;
@@ -1823,7 +1822,7 @@ body {
 
 /* ===== RESPONSIVE — VERY SMALL SCREENS (iPhone SE, etc.) ===== */
 @media (max-width: 360px) {
-  .hero-photo { height: 40vh; min-height: 200px; margin-bottom: 50px; }
+  .hero-photo { height: 40vh; min-height: 200px; }
   .hero-names-overlay { padding: 16px 12px; }
   .hero-date { font-size: 0.75rem; }
   .name { font-size: 1.8rem; }
@@ -1901,7 +1900,7 @@ body {
 
 /* ===== LANDSCAPE PHONE ===== */
 @media (max-height: 500px) and (orientation: landscape) {
-  .hero-photo { height: 50vh; min-height: 200px; margin-bottom: 40px; }
+  .hero-photo { height: 50vh; min-height: 200px; }
   .hero-names-overlay { padding: 16px 24px; }
 
   .name { font-size: 2rem; }
