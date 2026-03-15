@@ -94,10 +94,12 @@ const PORT = process.env.PORT || 3000;
 async function start() {
   await initDatabase();
 
-  // Auto-seed: insere presentes se a tabela estiver vazia (primeiro deploy)
+  // RESEED FORÇADO (temporário) — apaga presentes antigos e insere com novos preços
+  console.log('🔄 Reseed forçado: atualizando presentes com novos preços...');
+  await pool.query('DELETE FROM gifts');
   const { rows } = await pool.query('SELECT COUNT(*) as count FROM gifts');
   if (parseInt(rows[0].count) === 0) {
-    console.log('📦 Tabela de presentes vazia — executando seed automático...');
+    console.log('📦 Inserindo presentes atualizados...');
     const gifts = [
       { emoji: '📖', title: 'Manual de Instruções do Rafael', description: 'Para a Alleane não surtar no primeiro mês de convivência', price: 200, sort_order: 1 },
       { emoji: '🧹', title: 'Kit "Quem Vai Limpar a Casa"', description: 'Inclui dado de 20 faces pra decidir quem faz o quê', price: 210, sort_order: 2 },
