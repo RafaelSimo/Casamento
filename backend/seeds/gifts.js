@@ -1,0 +1,161 @@
+/**
+ * Seed dos presentes engraçados do casamento de Rafael & Alleane
+ * Execute com: npm run seed
+ */
+
+require('dotenv').config({ path: require('path').resolve(__dirname, '..', '.env') });
+const db = require('../database');
+
+const gifts = [
+  {
+    emoji: '🍕',
+    title: 'Fundo Pizza de Emergência',
+    description: 'Pra quando ninguém quiser cozinhar (vai acontecer MUITO)',
+    price: 80,
+    sort_order: 1
+  },
+  {
+    emoji: '📖',
+    title: 'Manual de Instruções do Rafael',
+    description: 'Para a Alleane não surtar no primeiro mês de convivência',
+    price: 60,
+    sort_order: 2
+  },
+  {
+    emoji: '🧹',
+    title: 'Kit "Quem Vai Limpar a Casa"',
+    description: 'Inclui dado de 20 faces pra decidir quem faz o quê',
+    price: 75,
+    sort_order: 3
+  },
+  {
+    emoji: '💐',
+    title: 'Fundo "Desculpa, Amor"',
+    description: 'Para as flores que o Rafael VAI ter que comprar... muitas vezes',
+    price: 100,
+    sort_order: 4
+  },
+  {
+    emoji: '💥',
+    title: 'Fundo pra Primeira Briga',
+    description: 'Vai acontecer... e precisa de chocolate, vinho e Netflix pra resolver',
+    price: 120,
+    sort_order: 5
+  },
+  {
+    emoji: '🍺',
+    title: 'Fundo Cerveja com os Amigos',
+    description: 'Permissão da esposa já inclusa (válida por 24h, condições se aplicam)',
+    price: 130,
+    sort_order: 6
+  },
+  {
+    emoji: '🆘',
+    title: 'Kit Sobrevivência do Marido',
+    description: 'Manual "Sim, querida" + chocolate de emergência + cartão "Eu errei"',
+    price: 150,
+    sort_order: 7
+  },
+  {
+    emoji: '🍽️',
+    title: '1 Semana de Almoço pro Rafael',
+    description: 'Porque cozinhar não é o forte dele (água queimada é especialidade)',
+    price: 200,
+    sort_order: 8
+  },
+  {
+    emoji: '📺',
+    title: '1 Ano de Streaming Premium',
+    description: 'Pra maratonar juntos sem brigar pelo controle remoto (spoiler: vão brigar)',
+    price: 250,
+    sort_order: 9
+  },
+  {
+    emoji: '🛡️',
+    title: 'Seguro Anti-Sogra (Bilateral)',
+    description: 'Proteção garantida dos dois lados. Não cobre visitas surpresa.',
+    price: 250,
+    sort_order: 10
+  },
+  {
+    emoji: '👨‍🍳',
+    title: 'Aulas de Culinária pro Rafael',
+    description: 'Pra ele parar de confundir sal com açúcar e descobrir que fogão não morde',
+    price: 300,
+    sort_order: 11
+  },
+  {
+    emoji: '👙',
+    title: '1 Ano de Calcinha pra Alleane',
+    description: 'Presente prático é presente de qualidade! (52 semanas, 52 calcinhas)',
+    price: 350,
+    sort_order: 12
+  },
+  {
+    emoji: '🐶',
+    title: 'Fundo Pro Primeiro Pet',
+    description: 'Antes do bebê, vem o dog! Já aceitamos sugestões de nome',
+    price: 350,
+    sort_order: 13
+  },
+  {
+    emoji: '🌹',
+    title: '1 Ano de Flores "Eu Errei"',
+    description: '52 buquês de "me perdoa, amor" — um por semana (o Rafael vai precisar)',
+    price: 400,
+    sort_order: 14
+  },
+  {
+    emoji: '🧘',
+    title: 'Terapia de Casal Preventiva',
+    description: 'Melhor prevenir do que remediar, né? 10 sessões pra começar bem',
+    price: 500,
+    sort_order: 15
+  },
+  {
+    emoji: '✈️',
+    title: 'Upgrade da Lua de Mel',
+    description: 'De barraca no quintal pra resort all-inclusive! Cada real conta!',
+    price: 1000,
+    sort_order: 16
+  }
+];
+
+// Limpa presentes existentes do seed (não remove adicionados manualmente)
+console.log('🌱 Iniciando seed dos presentes...\n');
+
+const existingCount = db.prepare('SELECT COUNT(*) as count FROM gifts').get().count;
+
+if (existingCount > 0) {
+  console.log(`⚠️  Já existem ${existingCount} presentes no banco. Limpando para re-seed...`);
+  db.prepare('DELETE FROM gifts').run();
+}
+
+const insert = db.prepare(`
+  INSERT INTO gifts (emoji, title, description, price, sort_order)
+  VALUES (@emoji, @title, @description, @price, @sort_order)
+`);
+
+const insertMany = db.transaction((gifts) => {
+  for (const gift of gifts) {
+    insert.run(gift);
+  }
+});
+
+insertMany(gifts);
+
+console.log(`✅ ${gifts.length} presentes inseridos com sucesso!\n`);
+console.log('Lista de presentes:');
+console.log('─'.repeat(60));
+
+gifts.forEach((g, i) => {
+  console.log(`  ${g.emoji}  ${g.title} — R$ ${g.price.toFixed(2)}`);
+  console.log(`     "${g.description}"`);
+  console.log('');
+});
+
+console.log('─'.repeat(60));
+console.log(`\n💰 Valor total da lista: R$ ${gifts.reduce((sum, g) => sum + g.price, 0).toFixed(2)}`);
+console.log('\n🎉 Seed concluído! Agora é só casar!\n');
+
+process.exit(0);

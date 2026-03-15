@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rafael & Alleane — Lista de Presentes 💒</title>
+  <meta name="description" content="Lista de presentes do casamento de Rafael e Alleane. Escolha um presente engraçado e nos ajude a começar essa nova vida!">
+  <meta name="theme-color" content="#C4917B">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Lato:wght@300;400;700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Floating Hearts Background -->
+  <div class="floating-hearts" id="floating-hearts" aria-hidden="true"></div>
+
+  <!-- ========== HERO ========== -->
+  <header class="hero" id="hero">
+    <div class="hero-decoration hero-decoration--top"></div>
+    <div class="hero-content">
+      <p class="hero-pretitle">Você foi convidado para celebrar o casamento de</p>
+      <h1 class="couple-names">
+        <span class="name name--groom">Rafael</span>
+        <span class="ampersand">&</span>
+        <span class="name name--bride">Alleane</span>
+      </h1>
+      <div class="hero-divider">
+        <span>💍</span>
+      </div>
+      <p class="hero-tagline">
+        Nos ajude a começar essa nova fase...<br>
+        <strong>sem falir!</strong> 💸
+      </p>
+      <p class="hero-subtitle">
+        Escolha um presente engraçado (mas muito útil!) da nossa lista.<br>
+        Cada centavo será usado com muito amor... e um pouco de humor.
+      </p>
+      <a href="#presentes" class="cta-button" id="cta-button">
+        <span>Ver a Lista de Presentes</span>
+        <span class="cta-icon">🎁</span>
+      </a>
+    </div>
+    <div class="hero-scroll-indicator">
+      <div class="scroll-arrow"></div>
+    </div>
+  </header>
+
+  <!-- ========== INTRO ========== -->
+  <section class="intro section" id="intro">
+    <div class="container">
+      <div class="intro-card">
+        <div class="intro-emoji">💌</div>
+        <h2>Como funciona?</h2>
+        <div class="intro-steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-icon">🎁</div>
+            <h3>Escolha um presente</h3>
+            <p>Navegue pela nossa lista de presentes (im)possíveis e escolha o que mais combina com você</p>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-icon">💳</div>
+            <h3>Pague online ou via PIX</h3>
+            <p>Use o Mercado Pago (cartão, boleto) ou faça um PIX direto — você decide!</p>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-icon">💕</div>
+            <h3>Deixe um recado</h3>
+            <p>Mande uma mensagem carinhosa (ou zoeira) pra gente ler no dia mais feliz das nossas vidas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PRESENTES ========== -->
+  <section class="gifts-section section" id="presentes">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Lista de Presentes</h2>
+        <p class="section-subtitle">Cada presente é único — assim como cada um de vocês! 🥰</p>
+      </div>
+
+      <div class="gifts-stats" id="gifts-stats">
+        <div class="stat">
+          <span class="stat-number" id="stat-total">0</span>
+          <span class="stat-label">presentes</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" id="stat-claimed">0</span>
+          <span class="stat-label">já escolhidos</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number" id="stat-available">0</span>
+          <span class="stat-label">disponíveis</span>
+        </div>
+      </div>
+
+      <div class="gifts-grid" id="gifts-grid">
+        <!-- Cards preenchidos via JavaScript -->
+        <div class="loading-spinner" id="loading-spinner">
+          <div class="spinner"></div>
+          <p>Carregando presentes...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MURAL DE RECADOS ========== -->
+  <section class="messages-section section" id="recados">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Mural de Recados</h2>
+        <p class="section-subtitle">Mensagens carinhosas (e zoeiras) dos nossos convidados 💬</p>
+      </div>
+      <div class="messages-grid" id="messages-grid">
+        <p class="no-messages" id="no-messages">Ainda não temos recados... Seja o primeiro! 🥺</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <p class="footer-names">Rafael & Alleane</p>
+        <p class="footer-message">Obrigado por fazer parte desse dia tão especial! 💒</p>
+        <p class="footer-heart">Made with ❤️ e um pouco de loucura</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== MODAL DE PAGAMENTO ========== -->
+  <div class="modal-overlay" id="payment-modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <button class="modal-close" id="modal-close" aria-label="Fechar">&times;</button>
+
+      <!-- Step 1: Dados do convidado -->
+      <div class="modal-step" id="modal-step-1">
+        <div class="modal-header">
+          <div class="modal-emoji" id="modal-emoji"></div>
+          <h2 class="modal-title" id="modal-title"></h2>
+          <p class="modal-description" id="modal-description"></p>
+          <div class="modal-price" id="modal-price"></div>
+        </div>
+
+        <form class="payment-form" id="payment-form">
+          <input type="hidden" id="form-gift-id">
+          <div class="form-group">
+            <label for="form-name">Seu nome *</label>
+            <input type="text" id="form-name" placeholder="Como os noivos te conhecem?" required maxlength="100">
+          </div>
+          <div class="form-group">
+            <label for="form-email">Seu e-mail <small>(opcional, para comprovante)</small></label>
+            <input type="email" id="form-email" placeholder="seu@email.com" maxlength="150">
+          </div>
+          <div class="form-group">
+            <label for="form-message">Deixe um recado para os noivos 💌</label>
+            <textarea id="form-message" rows="3" placeholder="Escreva algo bonito... ou engraçado!" maxlength="500"></textarea>
+          </div>
+
+          <div class="payment-methods">
+            <p class="payment-methods-title">Como deseja pagar?</p>
+            <button type="button" class="pay-method pay-method--mp" id="btn-pay-mp">
+              <span class="pay-method-icon">💳</span>
+              <span class="pay-method-text">
+                <strong>Mercado Pago</strong>
+                <small>Cartão, boleto ou PIX automático</small>
+              </span>
+            </button>
+            <button type="button" class="pay-method pay-method--pix" id="btn-pay-pix">
+              <span class="pay-method-icon">📱</span>
+              <span class="pay-method-text">
+                <strong>PIX Manual</strong>
+                <small>Use a chave PIX dos noivos</small>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Step 2: PIX Manual -->
+      <div class="modal-step hidden" id="modal-step-pix">
+        <div class="modal-header">
+          <div class="modal-emoji">📱</div>
+          <h2>Pagamento via PIX</h2>
+        </div>
+        <div class="pix-info">
+          <div class="pix-amount" id="pix-amount"></div>
+          <div class="pix-details">
+            <p><strong>Chave PIX:</strong></p>
+            <div class="pix-key-box">
+              <span id="pix-key-display"></span>
+              <button type="button" class="pix-copy-btn" id="pix-copy-btn" title="Copiar chave PIX">📋</button>
+            </div>
+            <p class="pix-name" id="pix-name-display"></p>
+          </div>
+          <div class="pix-instructions">
+            <p>1. Abra o app do seu banco</p>
+            <p>2. Faça um PIX com o valor <strong>exato</strong> acima</p>
+            <p>3. Clique no botão abaixo para confirmar</p>
+          </div>
+          <button type="button" class="btn-confirm-pix" id="btn-confirm-pix">
+            ✅ Já fiz o PIX!
+          </button>
+          <button type="button" class="btn-back" id="btn-back-pix">
+            ← Voltar
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Sucesso -->
+      <div class="modal-step hidden" id="modal-step-success">
+        <div class="success-content">
+          <div class="success-icon">🎉</div>
+          <h2>Presente garantido!</h2>
+          <p class="success-message" id="success-message">
+            Obrigado! Rafael e Alleane vão amar!
+          </p>
+          <div class="success-confetti" id="success-confetti"></div>
+          <button type="button" class="btn-close-success" id="btn-close-success">
+            Fechar
+          </button>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div class="modal-step hidden" id="modal-step-loading">
+        <div class="loading-content">
+          <div class="spinner spinner--large"></div>
+          <p>Processando pagamento...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== TOAST NOTIFICATIONS ========== -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

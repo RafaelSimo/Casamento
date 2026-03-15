@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Rafael & Alleane</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #C4917B;
+      --primary-dark: #A0725E;
+      --accent: #D4AF37;
+      --bg: #F8F5F1;
+      --card: #FFFFFF;
+      --text: #2C1810;
+      --text-light: #6B4F3F;
+      --success: #4CAF50;
+      --warning: #FF9800;
+      --danger: #f44336;
+      --border: #E8DDD5;
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Lato', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ===== LOGIN ===== */
+    .login-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 40px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .login-card h1 { font-size: 24px; margin-bottom: 8px; }
+    .login-card p { color: var(--text-light); margin-bottom: 24px; }
+
+    .login-card .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .login-card label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .login-card input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .login-btn:hover { background: var(--primary-dark); }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 14px;
+      margin-top: 12px;
+      display: none;
+    }
+
+    /* ===== DASHBOARD ===== */
+    .dashboard { display: none; }
+
+    .topbar {
+      background: var(--card);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar h1 { font-size: 18px; }
+    .topbar-actions { display: flex; gap: 8px; }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: var(--success); color: white; }
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-outline {
+      background: transparent;
+      color: var(--text-light);
+      border: 2px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .dashboard-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .stat-card .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .stat-card .stat-label {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 24px;
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 4px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-light);
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .tab:hover:not(.active) {
+      background: rgba(196, 145, 123, 0.1);
+    }
+
+    /* Table */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .table-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+
+    .table-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-header h3 { font-size: 16px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: #faf7f4;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td { font-size: 14px; }
+
+    tr:hover td { background: #fdfbf9; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-success { background: #E8F5E9; color: #2E7D32; }
+    .badge-warning { background: #FFF3E0; color: #E65100; }
+    .badge-danger { background: #FFEBEE; color: #C62828; }
+    .badge-info { background: #E3F2FD; color: #1565C0; }
+    .badge-default { background: #F5F5F5; color: #616161; }
+
+    .actions-cell { display: flex; gap: 6px; }
+    .actions-cell .btn { padding: 5px 10px; font-size: 12px; }
+
+    .emoji-cell { font-size: 20px; }
+
+    /* Gift Form Modal */
+    .admin-modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .admin-modal-overlay.visible { display: flex; }
+
+    .admin-modal {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .admin-modal h2 { margin-bottom: 20px; }
+
+    .admin-modal .form-group {
+      margin-bottom: 16px;
+    }
+
+    .admin-modal label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .admin-modal input,
+    .admin-modal textarea,
+    .admin-modal select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .admin-modal input:focus,
+    .admin-modal textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .admin-modal .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .admin-modal .form-actions .btn { flex: 1; padding: 10px; }
+
+    /* Messages */
+    .message-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+
+    .message-card .msg-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .message-card .msg-name { font-weight: 700; }
+    .message-card .msg-gift { font-size: 13px; color: var(--text-light); }
+    .message-card .msg-text { font-size: 15px; line-height: 1.5; }
+    .message-card .msg-date { font-size: 12px; color: var(--text-light); margin-top: 8px; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .tabs { flex-wrap: wrap; }
+      .tab { flex: none; }
+      table { font-size: 13px; }
+      th, td { padding: 8px 10px; }
+      .dashboard-content { padding: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    /* Toast */
+    .admin-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      background: var(--text);
+      color: white;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 9999;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== LOGIN ===== -->
+  <div class="login-wrapper" id="login-section">
+    <div class="login-card">
+      <h1>💒 Painel Admin</h1>
+      <p>Casamento Rafael & Alleane</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-user">Usuário</label>
+          <input type="text" id="login-user" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Senha</label>
+          <input type="password" id="login-pass" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="login-btn">Entrar</button>
+        <p class="login-error" id="login-error"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div class="dashboard" id="dashboard">
+    <div class="topbar">
+      <h1>💒 Painel do Casamento</h1>
+      <div class="topbar-actions">
+        <a href="/" class="btn btn-outline">🌐 Ver Site</a>
+        <button class="btn btn-outline" id="btn-logout">Sair</button>
+      </div>
+    </div>
+
+    <div class="dashboard-content">
+      <!-- Stats -->
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total-gifts">-</div>
+          <div class="stat-label">Total de Presentes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-claimed-gifts">-</div>
+          <div class="stat-label">Presentes Escolhidos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-pending-gifts">-</div>
+          <div class="stat-label">Aguardando Confirmação</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total-raised">-</div>
+          <div class="stat-label">Valor Arrecadado</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-total-messages">-</div>
+          <div class="stat-label">Recados Recebidos</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" data-panel="gifts-panel">🎁 Presentes</button>
+        <button class="tab" data-panel="payments-panel">💰 Pagamentos</button>
+        <button class="tab" data-panel="messages-panel">💬 Recados</button>
+      </div>
+
+      <!-- Gifts Panel -->
+      <div class="panel active" id="gifts-panel">
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Lista de Presentes</h3>
+            <button class="btn btn-primary" id="btn-add-gift">+ Novo Presente</button>
+          </div>
+          <div style="overflow-x: auto">
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Presente</th>
+                  <th>Preço</th>
+                  <th>Status</th>
+                  <th>Escolhido por</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="gifts-table-body">
+                <tr><td colspan="6" style="text-align:center;padding:40px;">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payments Panel -->
+      <div class="panel" id="payments-panel">
+        <div class="table-card">
+          <div class="table-header">
+            <h3>Pagamentos</h3>
+          </div>
+          <div style="overflow-x: auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Presente</th>
+                  <th>Valor</th>
+                  <th>Convidado</th>
+                  <th>Método</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="payments-table-body">
+                <tr><td colspan="7" style="text-align:center;padding:40px;">Carregando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Messages Panel -->
+      <div class="panel" id="messages-panel">
+        <div id="messages-list">
+          <p style="text-align:center;padding:40px;color:var(--text-light)">Carregando...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gift Form Modal -->
+  <div class="admin-modal-overlay" id="gift-modal">
+    <div class="admin-modal">
+      <h2 id="gift-modal-title">Novo Presente</h2>
+      <form id="gift-form">
+        <input type="hidden" id="gift-form-id">
+        <div class="form-group">
+          <label for="gift-form-emoji">Emoji</label>
+          <input type="text" id="gift-form-emoji" placeholder="🎁" required maxlength="10">
+        </div>
+        <div class="form-group">
+          <label for="gift-form-title">Título</label>
+          <input type="text" id="gift-form-title" placeholder="Nome do presente" required maxlength="100">
+        </div>
+        <div class="form-group">
+          <label for="gift-form-desc">Descrição engraçada</label>
+          <textarea id="gift-form-desc" rows="2" placeholder="Uma descrição divertida" required maxlength="300"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="gift-form-price">Preço (R$)</label>
+          <input type="number" id="gift-form-price" placeholder="100" required min="1" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="gift-form-order">Ordem de exibição</label>
+          <input type="number" id="gift-form-order" placeholder="0" value="0" min="0">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn btn-outline" id="gift-modal-cancel">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>
