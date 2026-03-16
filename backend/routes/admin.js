@@ -4,28 +4,22 @@ const { pool } = require('../database');
 const bcrypt = require('bcrypt');
 const { authenticateToken, generateToken } = require('../middleware/auth');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 
-// Upload config
-const uploadDir = path.join(__dirname, '..', '..', 'frontend', 'images', 'gifts');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, `gift-${Date.now()}${ext}`);
-  }
+// Cloudinary config
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
+// Upload config - memory storage (envia pra Cloudinary)
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowed.includes(ext)) cb(null, true);
+    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowed.includes(file.mimetype)) cb(null, true);
     else cb(new Error('Tipo de arquivo não permitido.'));
   }
 });
@@ -168,11 +162,27 @@ router.put('/gifts/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// POST /api/admin/gifts/upload-image - Upload imagem do presente
-router.post('/gifts/upload-image', authenticateToken, upload.single('image'), (req, res) => {
+// POST /api/admin/gifts/upload-image - Upload imagem do presente (Cloudinary)
+router.post('/gifts/upload-image', authenticateToken, upload.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'Nenhuma imagem enviada.' });
-  const imageUrl = `images/gifts/${req.file.filename}`;
-  res.json({ url: imageUrl });
+
+  try {
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'casamento/gifts', transformation: [{ width: 600, height: 600, crop: 'limit', quality: 'auto' }] },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      stream.end(req.file.buffer);
+    });
+
+    res.json({ url: result.secure_url });
+  } catch (err) {
+    console.error('Erro upload Cloudinary:', err);
+    res.status(500).json({ error: 'Erro ao enviar imagem.' });
+  }
 });
 
 // DELETE /api/admin/gifts/:id - Remover presente
